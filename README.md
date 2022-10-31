@@ -1,1 +1,0 @@
-# Questions for practicing MongoDB.
