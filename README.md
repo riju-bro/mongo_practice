@@ -278,3 +278,189 @@ Insert the following data into `persons` collection
 ```javascript
   db.persons.insertMany(givenData)
 ```
+
+## Relationships
+
+### Insert the following documents into a `users` collection
+
+```javascript
+[
+    {   username : "GoodGuyGreg",
+        first_name : "Good Guy",
+        last_name : "Greg"
+    },
+    {
+        username : "ScumbagSteve",
+        full_name :{
+            first : "Scumbag",
+            last : "Steve"
+        }
+        
+    }
+]
+```
+
+## Answer
+```javascript
+  db.users.insertMany(givenData)
+```
+### Insert the following array into a `posts` collection
+
+```javascript
+[
+    {
+        username : "GoodGuyGreg",
+        title : "Passes out at party",
+        body : "Wakes up early and cleans house"
+    },
+    {
+        username : "GoodGuyGreg",
+        title : "Steals your identity",
+        body : "Raises your credit score"
+    },
+    {
+        username : "GoodGuyGreg",
+        title : "Reports a bug in your code",
+        body : "Sends you a Pull Request"
+    },
+    {
+        username : "ScumbagSteve",
+        title : "Borrows something",
+        body : "Sells it"
+    },
+    {
+        username : "ScumbagSteve",
+        title : "Borrows everything",
+        body : "The end"
+    },
+    {
+        username : "ScumbagSteve",
+        title : "Forks your repo on github",
+        body : "Sets to private"
+    }
+]
+```
+## Answer
+```javascript
+db.posts.insertMany(givenData)
+```
+
+### Insert the following documents into a `comments` collection
+
+```javascript
+{
+    username : "GoodGuyGreg",
+    comment : "Hope you got a good deal!",
+    post : [post_obj_id]
+}
+```
+where [post_obj_id] is the ObjectId of the `posts` document: "Borrows something"
+
+```javascript
+{
+    username : "GoodGuyGreg",
+    comment : "What's mine is yours!",
+    post : [post_obj_id]
+}
+```
+where [post_obj_id] is the ObjectId of the `posts` document: "Borrows everything"
+
+```javascript
+{
+    username : "GoodGuyGreg",
+    comment : "Don't violate the licensing agreement!",
+    post : [post_obj_id]
+}
+```
+where [post_obj_id] is the ObjectId of the `posts` document: "Forks your repo on github
+
+```javascript
+{
+    username : "ScumbagSteve",
+    comment : "It still isn't clean",
+    post : [post_obj_id],
+}
+```
+where [post_obj_id] is the ObjectId of the `posts` document: "Passes out at party"
+
+```javascript
+{
+    username : "ScumbagSteve",
+    comment : "Denied your PR cause I found a hack",
+    post : [post_obj_id]
+}
+```
+where [post_obj_id] is the ObjectId of the `posts` document: "Reports a bug in your code"
+
+
+### Don't forget to copy the post_obj_id from the posts collection
+
+## Answer
+```javascript
+db.posts.insertMany(givenData)
+```
+
+
+## Querying related collections
+
+1. find all users
+1. find all posts
+1. find all posts that was authored by "GoodGuyGreg"
+1. find all posts that was authored by "ScumbagSteve"
+1. find all comments
+1. find all comments that was authored by "GoodGuyGreg"
+1. find all comments that was authored by "ScumbagSteve"
+1. find all comments belonging to the post "Reports a bug in your code"
+
+## Querying related collections Answer
+
+1.
+```javascript
+db.users.find()
+```
+2.
+```javascript
+db.posts.find()
+```
+3.
+```javascript
+db.posts.find({username: "GoodGuyGreg"})
+```
+4.
+```javascript
+db.posts.find({username: "ScumbagSteve"})
+```
+5.
+```javascript
+db.comments.find()
+```
+6.
+```javascript
+db.comments.find({username: "GoodGuyGreg"})
+```
+7.
+```javascript
+db.comments.find({username: "ScumbagSteve"})
+```
+8.
+```javascript
+db.posts.aggregate([
+    {
+        $match: {title: "Reports a bug in your code"}
+    },
+    {
+        $project: {title: 1}
+    },
+    {
+        $lookup: {
+            from: "comments",
+            localField: "_id",
+            foreignField: "post",
+            as: "comments"
+        }
+    },
+    {
+        $project: {_id: 0}
+    }
+])
+```
