@@ -291,11 +291,8 @@ Insert the following data into `persons` collection
     },
     {
         username : "ScumbagSteve",
-        full_name :{
-            first : "Scumbag",
-            last : "Steve"
-        }
-        
+        first_name : "Scumbag",
+        last_name : "Steve"
     }
 ]
 ```
@@ -411,6 +408,9 @@ db.posts.insertMany(givenData)
 1. find all comments that was authored by "GoodGuyGreg"
 1. find all comments that was authored by "ScumbagSteve"
 1. find all comments belonging to the post "Reports a bug in your code"
+1. Set the gender to male for every user.
+1. Find the documents and add a new field called full_name to the documents.
+1. Find all articles and comments related to a user.
 
 ## Querying related collections Answer
 
@@ -461,6 +461,60 @@ db.posts.aggregate([
     },
     {
         $project: {_id: 0}
+    }
+])
+```
+
+9.
+```javascript
+db.users.updateMany(
+    {},
+    {$set: {gender: "male"}}
+)
+```
+
+
+10.
+```javascript
+db.users.aggregate([
+    {
+        /**
+         * newField: The new field name.
+         * expression: The new field expression.
+         */
+        $addFields: {
+          full_name: {$concat: ["$first_name", " ", "$last_name"]}
+        }
+    }
+])
+```
+11.
+```javascript
+db.users.aggregate([
+    {
+        $lookup: {
+          from: "posts",
+          localField: "username",
+          foreignField: "username",
+          as: "posts"
+        }
+    },
+    {
+        $lookup: {
+          from: "comments",
+          localField: "username",
+          foreignField: "username",
+          as: "comments"
+        }
+    },
+    {
+        $project: {
+            username: 1, 
+            "posts.title": 1,
+            "posts.body": 1,
+            "comments.comment": 1,
+            "comments.post": 1
+        }
     }
 ])
 ```
