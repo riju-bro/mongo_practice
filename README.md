@@ -278,6 +278,109 @@ Insert the following data into `persons` collection
 ```javascript
   db.persons.insertMany(givenData)
 ```
+## Questions
+
+1. Find all persons between the age between 20 and 30.
+1. Find all persons except those whose name isn't in ["Nathan Howell", "Marion Henry", "Emilie Stevenson"]
+1. Find all persons in one of these countries ["Canada", "United States", "France"]
+1. Set every person's gender to male.
+1. Remove the field gender from every document.
+1. Rename the name field name to fullName.
+1. Rename the fullName field to name.
+1. Find the count of documents.
+1. How many people live in each country? The output should only contain the country and count.  
+1. How many people live in India.
+1. Find the average age of each country. The output should only contain country and averageAge
+1. Find the people belonging to each country. The output should be like {country: "name of the country", persons: [names of people]}
+
+
+## Answer
+
+
+
+1.
+```javascript
+db.persons.find({age: {$gt: 20, $lt: 30}})
+```
+2.
+```javascript
+db.persons.find({name: {$nin: ["Nathan Howell", "Marion Henry", "Emilie Stevenson"]}})
+
+```
+3.
+```javascript
+db.persons.find({country: {$in: ["Canada", "United States", "France"]}})
+```
+4.
+```javascript
+db.persons.updateMany(
+    {},
+    {$set: {gender: "male"}}
+)
+```
+5.
+```javascript
+db.persons.updateMany(
+    {},
+    {$unset: {gender: true}}
+)
+```
+6.
+```javascript
+db.persons.updateMany(
+    {},
+    {$rename: {name: "fullName"}}
+)
+```
+7.
+```javascript
+db.persons.updateMany(
+    {},
+    {$rename: {fullName: "name"}}
+)
+```
+8.
+```javascript
+db.persons.countDocuments()
+```
+9.
+```javascript
+db.persons.aggregate([
+    {
+        $group:{
+            _id: "$country",
+            count: {$count: {}}
+        }
+    }
+])
+```
+10.
+```javascript
+db.persons.find({country: "India"}).count()
+```
+11.
+```javascript
+db.persons.aggregate([
+    {
+        $group: {
+            _id: "$country",
+            averageAge: {$avg: "$age"}
+        }
+    }
+])
+```
+12.
+```javascript
+db.persons.aggregate([
+    {
+        $group: {
+            _id: "$country",
+        persons: {$push: "$name"}    
+        }
+    }
+])
+
+```
 
 ## Relationships
 
